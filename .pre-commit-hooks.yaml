@@ -22,4 +22,3 @@
   language_version: python3
   pass_filenames: false
   args: ["-f", "requirements.txt", "-o", "requirements.txt"]
-
