@@ -6,7 +6,8 @@ Mirror of poetry for pre-commit. Inspired by mirror repos of https://github.com/
 This mirror will be archived when https://github.com/python-poetry/poetry/pull/2511 is merged.
 
 **EDIT: The PR was merged and will propably be released with the next 1.2 (pre-)release.
-I intend to support this mirror until the full release of 1.2.0.**
+I intend to support this mirror until the next release of 1.2.0. Afterwards new releases of 1.1.x
+are only supported on request via issue.**
 
 For pre-commit: see https://github.com/pre-commit/pre-commit
 For poetry: see https://github.com/python-poetry/poetry
