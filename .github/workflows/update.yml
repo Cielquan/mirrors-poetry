@@ -1,0 +1,47 @@
+name: main
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    name: update
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: git config --global user.name 'Github Actions'
+
+      - run: git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - run: git clone https://github.com/python-poetry/poetry ../poetry
+
+      - id: version_compare
+        run: |
+          newest_release=$(git -C ../poetry tag --list | tail -n1)
+          current_release=$(git tag --list | tail -n1)
+          python3 -m pip install -U packaging
+          is_newer=$(python3 -c 'import sys; from packaging import version; print(version.parse(sys.argv[1]) > version.parse(sys.argv[2]))' "$newest_release" "$current_release")
+          echo "NEWEST_RELEASE=${newest_release}" >> $GITHUB_OUTPUT
+          echo "IS_NEWER=${is_newer}" >> $GITHUB_OUTPUT
+
+      - id: create_new_release
+        if: ${{ steps.version_compare.outputs.IS_NEWER }} == "True"
+        run: |
+          newest_release="${{ steps.version_compare.outputs.NEWEST_RELEASE }}"
+          echo $newest_release > .version
+          cat > setup.py << EOF
+          from setuptools import setup
+          setup(name='pre_commit_dummy_package', version='0.0.0', install_requires=['poetry==$newest_release'])
+          EOF
+          echo y | cp ../poetry/.pre-commit-hooks.yaml .pre-commit-hooks.yaml
+          git add .version setup.py .pre-commit-hooks.yaml
+          git commit -m "${{ steps.version_compare.outputs.NEWEST_RELEASE }}"
+          git tag -am "${{ steps.version_compare.outputs.NEWEST_RELEASE }}" ${{ steps.version_compare.outputs.NEWEST_RELEASE }}
+          git remote set-url origin https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY
+          git push origin HEAD:refs/heads/main --tags
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
