@@ -25,7 +25,7 @@ jobs:
         id: version_compare
         run: |
           newest_release=$(git -C ../poetry tag --list | tail -n1)
-          current_release=$(git tag --list | tail -n1)
+          current_release=$(cat .version)
           python3 -m pip install -U packaging
           is_newer=$(python3 -c 'import sys; from packaging import version; print(version.parse(sys.argv[1]) > version.parse(sys.argv[2]))' "$newest_release" "$current_release")
           echo "NEWEST_RELEASE=${newest_release}" >> $GITHUB_OUTPUT
