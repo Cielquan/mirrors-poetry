@@ -13,13 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: git config --global user.name 'Github Actions'
+      - name: Set git user
+        run: |
+          git config --global user.name 'Github Actions'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - run: git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Clone poetry repo
+        run: git clone https://github.com/python-poetry/poetry ../poetry
 
-      - run: git clone https://github.com/python-poetry/poetry ../poetry
-
-      - id: version_compare
+      - name: Compare version
+        id: version_compare
         run: |
           newest_release=$(git -C ../poetry tag --list | tail -n1)
           current_release=$(git tag --list | tail -n1)
@@ -28,7 +31,8 @@ jobs:
           echo "NEWEST_RELEASE=${newest_release}" >> $GITHUB_OUTPUT
           echo "IS_NEWER=${is_newer}" >> $GITHUB_OUTPUT
 
-      - id: create_new_release
+      - name: Create new releaes
+        id: create_new_release
         if: ${{ steps.version_compare.outputs.IS_NEWER }} == "True"
         run: |
           newest_release="${{ steps.version_compare.outputs.NEWEST_RELEASE }}"
