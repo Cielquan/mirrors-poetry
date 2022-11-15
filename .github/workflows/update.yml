@@ -34,7 +34,7 @@ jobs:
 
       - name: Create new release
         id: create_new_release
-        if: ${{ steps.version_compare.outputs.IS_NEWER }} == 'True'
+        if: ${{ steps.version_compare.outputs.IS_NEWER == 'True' }}
         run: |
           newest_release="${{ steps.version_compare.outputs.NEWEST_RELEASE }}"
           echo ${newest_release} > .version
