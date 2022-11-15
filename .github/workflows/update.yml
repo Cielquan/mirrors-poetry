@@ -30,8 +30,9 @@ jobs:
           is_newer=$(python3 -c 'import sys; from packaging import version; print(version.parse(sys.argv[1]) > version.parse(sys.argv[2]))' "$newest_release" "$current_release")
           echo "NEWEST_RELEASE=${newest_release}" >> $GITHUB_OUTPUT
           echo "IS_NEWER=${is_newer}" >> $GITHUB_OUTPUT
+          echo ${newest_release} ${current_release} ${is_newer}
 
-      - name: Create new releaes
+      - name: Create new release
         id: create_new_release
         if: ${{ steps.version_compare.outputs.IS_NEWER }} == "True"
         run: |
